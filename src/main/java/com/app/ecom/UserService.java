@@ -1,5 +1,6 @@
 package com.app.ecom;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -8,29 +9,30 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private List<User> users = new ArrayList<>();
+    @Autowired
+    private UserRepository userRepository;
+
     private int id = 1;
 
     public List<User> fetchUsers(){
-        return users;
+        return userRepository.findAll();
     }
 
-    public List<User> updateUser(int id, User user){
-        return users.stream().filter(val->val.getId() == id)
+    public User updateUser(int id, User user){
+        return userRepository.findById(id)
                 .map(val->{
                     val.setFName(user.getFName());
                     val.setLName(user.getLName());
                     return val;
-                }).toList();
+                }).orElse(null);
     }
 
     public void createUser(User user){
-        user.setId(id++);
-        users.add(user);
+        //user.setId(id++);
+        userRepository.save(user);
     }
 
     public User fetchUserById(int id){
-        return users.stream().filter(val->val.getId() == id)
-                .findFirst().orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 }

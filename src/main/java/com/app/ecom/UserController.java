@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PutMapping("/api/users/{id}")
-    public ResponseEntity<List<User>> updateUser(@PathVariable int id, @RequestBody User user){
+    public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody User user){
         return Optional.ofNullable(service.updateUser(id,user))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
