@@ -47,37 +47,25 @@ public class CartService {
         }
     }
 
-    public CartItemResponse getCartItemsById(String id){
-        CartItem cartItem = cartItemRepository.findById(Integer.parseInt(id)).orElse(null);
-        if(cartItem == null) return null;
-        return CartItemResponse.builder()
-                .price(cartItem.getPrice())
-                .quantity(cartItem.getQuantity())
-                .user(cartItem.getUser())
-                .product(cartItem.getProduct())
-                .build();
+    public List<CartItem> getCartItems(String id){
+        List<CartItem> cartItems = cartItemRepository.findById(Integer.parseInt(id)).map(List::of).orElse(null);
+        return Optional.ofNullable(cartItems).orElse(null);
     }
-    public List<CartItemResponse> getCartItems(){
-        List<CartItem> cartItems = cartItemRepository.findAll();
-        return Optional.ofNullable(cartItems)
-                .map(cartItems1 ->
-                        cartItems1.stream().map(cartItem -> CartItemResponse.builder()
-                                .price(cartItem.getPrice())
-                                .quantity(cartItem.getQuantity())
-                                .user(cartItem.getUser())
-                                .product(cartItem.getProduct())
-                                .build()).toList()
-                ).orElse(null);
+
+    public String deleteCartItems(String productId, String userId){
+        Product product = productRepository.findById(Integer.parseInt(productId)).orElse(null);
+        if (product == null)return "Product not found";
+        User user = userRepository.findById(Integer.parseInt(userId)).orElse(null);
+        if (user == null)return "User not found";
+        cartItemRepository.deleteByUserAndProduct(user, product);
+        return "Cart items deleted successfully";
 
     }
 
-    public String deleteCartItems(String id){
-        if (cartItemRepository.existsById(Integer.parseInt(id))) {
-            cartItemRepository.deleteById(Integer.parseInt(id));
-            return "Cart items deleted successfully";
-        }else{
-            return "Cart items not found";
-        }
+    public void clerCart(String userId){
+        userRepository.findById(Integer.parseInt(userId)).ifPresent(
+                cartItemRepository::deleteByUser
+        );
     }
     public static CartItem mapCartItemFromReq(CartItemRequest req, Product product, User user){
         CartItem cartItem = new CartItem();

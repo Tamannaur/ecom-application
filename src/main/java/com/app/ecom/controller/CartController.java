@@ -2,6 +2,7 @@ package com.app.ecom.controller;
 
 import com.app.ecom.dto.CartItemRequest;
 import com.app.ecom.dto.CartItemResponse;
+import com.app.ecom.model.CartItem;
 import com.app.ecom.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,27 +31,18 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
-    @GetMapping("/id")
-    public ResponseEntity<CartItemResponse> getCartItemsById(@RequestHeader("X-User-Id") String userId){
-        CartItemResponse cartItems = cartService.getCartItemsById(userId);
-        if(cartItems == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(cartItems);
-    }
-
     @GetMapping
-    public ResponseEntity<List<CartItemResponse>> getCartItems(){
-        List<CartItemResponse> cartItems = cartService.getCartItems();
+    public ResponseEntity<List<CartItem>> getCartItems(@RequestHeader("X-User-Id") String userId){
+        List<CartItem> cartItems = cartService.getCartItems(userId);
         if(cartItems == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok(cartItems);
     }
 
-    @DeleteMapping
-    public ResponseEntity<String> deleteCartItems(@RequestHeader("X-User-Id")String id){
-        String s = cartService.deleteCartItems(id);
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<String> deleteCartItem(@PathVariable String productId, @RequestHeader("X-User-Id")String id){
+        String s = cartService.deleteCartItems(productId,id);
         if (s.endsWith("not found")){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(s);
         }
