@@ -14,11 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CartItemResponse {
 
-    private Integer id;
     private double price;
     private Integer quantity;
-
     private User user;
-
     private Product product;
 }
